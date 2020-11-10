@@ -1,7 +1,8 @@
-<?php require_once "header.php" ?>
+<?php require_once "header.php"; ?>
+<?php require_once "function.php";
+?>
 
 <?php
-
 //Condition - erreur 
 if (!empty($_POST)) {
     $errors = array();
@@ -14,12 +15,11 @@ if (!empty($_POST)) {
         //var_dump ($errors);  pour vérifier que la condition est bien prise en compte = débuger 
     } else {
         $req = $pdo->prepare('SELECT id FROM users WHERE username = ?');
-        $req->execute(['$_POST'['username']]);
+        $req->execute([$_POST['username']]);
         $user = $req->fetch();
         if ($user) {
             $errors['username'] = "Ce pseudo est déjà pris";
         } // Vérification qu'il n'y a pas déjà un username identique
-
 
     }
 
@@ -28,7 +28,7 @@ if (!empty($_POST)) {
         //vérification de l'email
     } else {
         $req = $pdo->prepare('SELECT id FROM users WHERE email = ?');
-        $req->execute(['$_POST'['email']]);
+        $req->execute([$_POST['email']]);
         $user = $req->fetch();
         if ($user) {
             $errors['email'] = "Cet email est déjà utilisé pour un autre compte";
@@ -58,9 +58,10 @@ if (!empty($_POST)) {
         $token = str_random(60);
         $req->execute([$_POST['username'], $password, $_POST['email'], $token]);
         $user_id = $pdo->lastInsertId();
-        mail($_POST['email'], "Confirmation de votre compte", "Afin de valider votre compte merci de cliquer sur ce lien"); //ajouter le lien ainsi que l'id
+        mail($_POST['email'], "Confirmation de votre compte", "Afin de valider votre compte merci de cliquer sur ce lien : http://localhost/film/assets/register.php"); //ajouter le lien ainsi que l'id
         //Envoies un mail de confirmation
         //'->' = ordre de le faire - prepare - execute
+        $_SESSION['flash']['success'] = "Un email de confirmation ou a été renvoyé pour activé votre compte";
         header('Location: login.php');
         exit();
         die("Notre compte a bien été crée");
